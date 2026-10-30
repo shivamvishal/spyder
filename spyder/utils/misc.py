@@ -55,8 +55,13 @@ def move_file(source, dest):
     If file is a Python script, also rename .pyc and .pyo files if any
     """
     import shutil
-    shutil.copy(source, dest)
-    remove_file(source)
+
+    # Don't copy and then send the source to the trash because that leaves
+    # the source in place for filesystems without a trash, like Windows
+    # network shares.
+    # Fixes spyder-ide/spyder#26432
+    shutil.move(source, dest)
+    __remove_pyc_pyo(source)
 
 
 def onerror(function, path, excinfo):
